@@ -54,15 +54,44 @@ export default function Chat() {
   };
 
   const sendToBackend = async (audioBlob: Blob) => {
-    // Mock API call
-    const formData = new FormData();
-    formData.append("audio", audioBlob);
+    // Upload recorded audio to backend transcription API
+    try {
+      const formData = new FormData();
+      // backend expects a multipart file named 'audioFile'
+      formData.append("audioFile", audioBlob, "recording.webm");
 
-    // Simulate API response
-    setTimeout(() => {
-      const mockTranscript = "This is a mock transcript from the audio.";
-      appendToPrompt(mockTranscript);
-    }, 2000);
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000); // 30s
+
+      const res = await fetch("http://localhost:8080/api/v1/audio/transcribe", {
+        method: "POST",
+        body: formData,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeout);
+
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        throw new Error(
+          `Transcription failed: ${res.status} ${res.statusText} ${
+            body ? `- ${body}` : ""
+          }`
+        );
+      }
+
+      const transcript = await res.text();
+      if (transcript) {
+        appendToPrompt(transcript);
+      }
+    } catch (err: unknown) {
+      const e = err as { name?: string; message?: string };
+      if (e?.name === "AbortError") {
+        console.error("Transcription request timed out");
+      } else {
+        console.error("Error transcribing audio:", e?.message || err);
+      }
+    }
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {

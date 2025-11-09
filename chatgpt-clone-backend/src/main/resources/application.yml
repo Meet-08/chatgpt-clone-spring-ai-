@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: chatgpt-clone-backend
+  ai:
+    azure:
+      openai:
+        api-key: ${AZURE_OPENAI_API_KEY}
+        endpoint: ${AZURE_OPENAI_ENDPOINT}
+        chat:
+          options:
+            deployment-name: o4-mini
+            temperature: 1
+        image:
+          options:
+            deployment-name: FLUX-1.1-pro
+        audio:
+          transcription:
+            options:
+              deployment-name: whisper
