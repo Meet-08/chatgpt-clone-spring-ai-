@@ -17,3 +17,16 @@ spring:
           transcription:
             options:
               deployment-name: whisper
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/chatgpt_clone
+    username: meet
+    password: 1234
+
+  main:
+    allow-bean-definition-overriding: true
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:init/schema.sql

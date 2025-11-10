@@ -1,1 +1,13 @@
 services:
+  pg-vector:
+    image: 'pgvector/pgvector:pg18'
+    environment:
+      - 'POSTGRES_DB=chatgpt_clone'
+      - 'POSTGRES_USER=meet'
+      - 'POSTGRES_PASSWORD=1234'
+
+    labels:
+      - "org.springframework.boot.service-connection=postgres"
+
+    ports:
+      - '5432'

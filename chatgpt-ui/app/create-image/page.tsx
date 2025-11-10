@@ -1,5 +1,23 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  ArrowLeft,
+  Download,
+  ExternalLink,
+  Mic,
+  MicOff,
+  Sparkles,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -210,110 +228,131 @@ export default function CreateImage() {
       <div className="max-w-2xl mx-auto">
         <Link
           href="/"
-          className="text-blue-500 hover:text-blue-700 mb-6 inline-flex items-center transition-colors"
+          className="flex items-center text-blue-500 hover:text-blue-700 mb-6 transition-colors"
         >
-          ← Back to Home
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Home
         </Link>
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
-          <h1 className="text-4xl font-bold text-center mb-8 bg-linear-to-r from-indigo-600 to-cyan-600 bg-clip-text text-transparent">
-            🎨 Create Image
-          </h1>
-          <div className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Describe your image
-              </label>
-              <textarea
-                value={currentPrompt}
-                onChange={(e) => setCurrentPrompt(e.target.value)}
-                placeholder="A beautiful sunset over mountains..."
-                className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white"
-                rows={4}
-              />
-            </div>
-            <div className="flex gap-4 items-center">
-              <button
-                onClick={isRecording ? stopRecording : startRecording}
-                className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-                  isRecording
-                    ? "bg-red-500 hover:bg-red-600 text-white shadow-lg animate-pulse"
-                    : "bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg hover:shadow-xl transform hover:scale-105"
-                }`}
+        <Card className="shadow-xl">
+          <CardHeader>
+            <CardTitle className="text-4xl font-bold text-center bg-linear-to-r from-indigo-600 to-cyan-600 bg-clip-text text-transparent flex items-center justify-center gap-2">
+              <Sparkles className="h-8 w-8" />
+              Create Image
+            </CardTitle>
+            <CardDescription className="text-center">
+              Describe your vision and let AI bring it to life
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Describe your image
+                </label>
+                <Textarea
+                  value={currentPrompt}
+                  onChange={(e) => setCurrentPrompt(e.target.value)}
+                  placeholder="A beautiful sunset over mountains..."
+                  className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  rows={4}
+                />
+              </div>
+              <div className="flex gap-4 items-center">
+                <Button
+                  onClick={isRecording ? stopRecording : startRecording}
+                  variant={isRecording ? "destructive" : "outline"}
+                  className={`transition-all duration-300 ${
+                    isRecording ? "animate-pulse" : ""
+                  }`}
+                >
+                  {isRecording ? (
+                    <MicOff className="mr-2 h-4 w-4" />
+                  ) : (
+                    <Mic className="mr-2 h-4 w-4" />
+                  )}
+                  {isRecording ? "Stop Recording" : "Start Recording"}
+                </Button>
+                {isRecording && (
+                  <span className="text-red-500 font-medium animate-pulse">
+                    Recording...
+                  </span>
+                )}
+              </div>
+              <Button
+                onClick={handleGenerate}
+                disabled={isGenerating}
+                className="w-full bg-linear-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
+                size="lg"
               >
-                {isRecording ? "⏹️ Stop Recording" : "🎤 Start Recording"}
-              </button>
-              {isRecording && (
-                <span className="text-red-500 font-medium animate-pulse">
-                  Recording...
-                </span>
-              )}
-            </div>
-            <button
-              onClick={handleGenerate}
-              disabled={isGenerating}
-              className="w-full px-6 py-4 bg-linear-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {isGenerating ? "Generating... ✨" : "✨ Generate Image"}
-            </button>
+                <Sparkles className="mr-2 h-5 w-5" />
+                {isGenerating ? "Generating..." : "Generate Image"}
+              </Button>
 
-            {/* Result / Error area */}
-            <div className="mt-6">
-              {error && (
-                <div className="text-sm text-red-600 dark:text-red-400 mb-4">
-                  {error}
-                </div>
-              )}
-
-              {generatedImage && (
-                <div className="flex flex-col items-center gap-4">
-                  <div className="w-full bg-gray-50 dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
-                    {generatedImage.startsWith("blob:") ? (
-                      // blob/object URLs — use a plain img tag
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={generatedImage}
-                        alt="Generated"
-                        className="w-full h-auto rounded-md mx-auto"
-                      />
-                    ) : (
-                      <Image
-                        src={generatedImage}
-                        alt="Generated"
-                        width={1024}
-                        height={1024}
-                        className="w-full h-auto rounded-md mx-auto"
-                      />
-                    )}
+              {/* Result / Error area */}
+              <div className="mt-6">
+                {error && (
+                  <div className="text-sm text-red-600 dark:text-red-400 mb-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                    {error}
                   </div>
+                )}
 
-                  <div className="flex gap-3">
-                    <a
-                      href={generatedImage}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow"
-                    >
-                      Open in new tab
-                    </a>
-                    <a
-                      href={generatedImage}
-                      download={`generated-image.${
-                        imageMime
-                          ? imageMime.includes("jpeg")
-                            ? "jpg"
-                            : imageMime.split("/")[1] ?? "png"
-                          : "png"
-                      }`}
-                      className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg shadow"
-                    >
-                      Download
-                    </a>
+                {generatedImage && (
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="w-full bg-gray-50 dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
+                      {generatedImage.startsWith("blob:") ? (
+                        // blob/object URLs — use a plain img tag
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={generatedImage}
+                          alt="Generated"
+                          className="w-full h-auto rounded-md mx-auto"
+                        />
+                      ) : (
+                        <Image
+                          src={generatedImage}
+                          alt="Generated"
+                          width={1024}
+                          height={1024}
+                          className="w-full h-auto rounded-md mx-auto"
+                        />
+                      )}
+                    </div>
+
+                    <Separator className="my-4" />
+
+                    <div className="flex gap-3">
+                      <Button asChild variant="outline">
+                        <a
+                          href={generatedImage}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <ExternalLink className="mr-2 h-4 w-4" />
+                          Open in new tab
+                        </a>
+                      </Button>
+                      <Button asChild>
+                        <a
+                          href={generatedImage}
+                          download={`generated-image.${
+                            imageMime
+                              ? imageMime.includes("jpeg")
+                                ? "jpg"
+                                : imageMime.split("/")[1] ?? "png"
+                              : "png"
+                          }`}
+                        >
+                          <Download className="mr-2 h-4 w-4" />
+                          Download
+                        </a>
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
