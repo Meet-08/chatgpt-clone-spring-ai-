@@ -17,7 +17,6 @@ public class AudioController {
     @PostMapping("/transcribe")
     public ResponseEntity<String> transcribeAudio(@RequestBody MultipartFile audioFile) {
         String transcription = audioService.transcribeAudio(audioFile);
-        System.out.println("Transcription: " + transcription);
         return ResponseEntity.ok(transcription);
     }
 
